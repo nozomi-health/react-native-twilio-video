@@ -241,24 +241,18 @@ export default class TwilioVideo extends Component {
    * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    */
   connect({
-    roomName,
-    accessToken,
-    cameraType = "front",
-    enableAudio = true,
-    enableVideo = true,
-    encodingParameters = null,
-    enableNetworkQualityReporting = false,
-    dominantSpeakerEnabled = false,
-  }) {
+            roomName,
+            accessToken,
+            cameraType = "front",
+            enableAudio = true,
+            enableVideo = true,
+            encodingParameters = null,
+            enableNetworkQualityReporting = false,
+            dominantSpeakerEnabled = false,
+          }) {
     TWVideoModule.connect(
-      accessToken,
-      roomName,
-      enableAudio,
-      enableVideo,
-      encodingParameters,
-      enableNetworkQualityReporting,
-      dominantSpeakerEnabled,
-      cameraType
+        accessToken,
+        roomName,
     );
   }
 
