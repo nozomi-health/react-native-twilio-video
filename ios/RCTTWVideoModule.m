@@ -302,7 +302,7 @@ RCT_EXPORT_METHOD(toggleScreenSharing: (BOOL) value) {
          TVILocalParticipant *localParticipant = self.room.localParticipant;
          [localParticipant publishVideoTrack:self.localVideoTrack];
        }
-       [self.screen startCapture];    
+       [self.screen startCapture];
   } else {
         [self unpublishLocalVideo];
         [self.screen stopCapture];
@@ -421,11 +421,11 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
-  [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
-  if (self.localAudioTrack) {
-    [self.localAudioTrack setEnabled:enableAudio];
-  }
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName /*enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType*/) {
+//  [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
+//  if (self.localAudioTrack) {
+//    [self.localAudioTrack setEnabled:enableAudio];
+//  }
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
@@ -441,25 +441,25 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     if (self.localDataTrack) {
       builder.dataTracks = @[self.localDataTrack];
     }
-      
-    builder.dominantSpeakerEnabled = dominantSpeakerEnabled ? YES : NO;
+
+//    builder.dominantSpeakerEnabled = dominantSpeakerEnabled ? YES : NO;
 
     builder.roomName = roomName;
 
-    if(encodingParameters[@"enableH264Codec"]){
-      builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
-    }
-
-    if(encodingParameters[@"audioBitrate"] || encodingParameters[@"videoBitrate"]){
-      NSInteger audioBitrate = [encodingParameters[@"audioBitrate"] integerValue];
-      NSInteger videoBitrate = [encodingParameters[@"videoBitrate"] integerValue];
-      builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:(audioBitrate) ? audioBitrate : 40 videoBitrate:(videoBitrate) ? videoBitrate : 1500];
-    }
-
-    if (enableNetworkQualityReporting) {
-      builder.networkQualityEnabled = true;
-      builder.networkQualityConfiguration = [ [TVINetworkQualityConfiguration alloc] initWithLocalVerbosity:TVINetworkQualityVerbosityMinimal remoteVerbosity:TVINetworkQualityVerbosityMinimal];
-    }
+//    if(encodingParameters[@"enableH264Codec"]){
+//      builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
+//    }
+//
+//    if(encodingParameters[@"audioBitrate"] || encodingParameters[@"videoBitrate"]){
+//      NSInteger audioBitrate = [encodingParameters[@"audioBitrate"] integerValue];
+//      NSInteger videoBitrate = [encodingParameters[@"videoBitrate"] integerValue];
+//      builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:(audioBitrate) ? audioBitrate : 40 videoBitrate:(videoBitrate) ? videoBitrate : 1500];
+//    }
+//
+//    if (enableNetworkQualityReporting) {
+//      builder.networkQualityEnabled = true;
+//      builder.networkQualityConfiguration = [ [TVINetworkQualityConfiguration alloc] initWithLocalVerbosity:TVINetworkQualityVerbosityMinimal remoteVerbosity:TVINetworkQualityVerbosityMinimal];
+//    }
 
   }];
 
@@ -545,6 +545,8 @@ RCT_EXPORT_METHOD(disconnect) {
   self.localParticipant = room.localParticipant;
   self.localParticipant.delegate = self;
 
+    NSLog(@"Connecting to room: %@", room.name);
+
   [participants addObject:[self.localParticipant toJSON]];
   [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants, @"localParticipant" : [self.localParticipant toJSON] }];
 
@@ -565,6 +567,9 @@ RCT_EXPORT_METHOD(disconnect) {
 - (void)room:(TVIRoom *)room didFailToConnectWithError:(nonnull NSError *)error{
   self.localDataTrack = nil;
   self.room = nil;
+
+    NSLog(@"Connecting to room failed");
+
 
   NSMutableDictionary *body = [@{ @"roomName": room.name, @"roomSid": room.sid } mutableCopy];
 

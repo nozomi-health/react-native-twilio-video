@@ -14,7 +14,8 @@ import {
   findNodeHandle,
   requireNativeComponent,
 } from "react-native";
-import React, { Component } from "react";
+import React, { Component,   createRef
+} from "react";
 
 import PropTypes from "prop-types";
 
@@ -170,6 +171,9 @@ const nativeEvents = {
 };
 
 class CustomTwilioVideoView extends Component {
+  _setVideoViewRef = (ref) => {
+        this._videoView = ref;
+      };
   connect({
     roomName,
     accessToken,
@@ -270,12 +274,9 @@ class CustomTwilioVideoView extends Component {
   runCommand(event, args) {
     switch (Platform.OS) {
       case "android":
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.videoView),
-          event,
-          args
-        );
-        break;
+        const node = findNodeHandle(this._videoView);
+            if (node != null)
+                UIManager.dispatchViewManagerCommand(node, event, args);        break;
       default:
         break;
     }
@@ -320,7 +321,7 @@ class CustomTwilioVideoView extends Component {
   render() {
     return (
       <NativeCustomTwilioVideoView
-        ref="videoView"
+        ref={this._setVideoViewRef}
         {...this.props}
         {...this.buildNativeEventWrappers()}
       />
